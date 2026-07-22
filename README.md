@@ -1,6 +1,10 @@
 # Trabajo Práctico Integrador
 ## Desarrollo de Software 2026
 
+###Silva Victor Augusto | 50453 | 3k2
+###Victoria Agustina Mariel | 50161 | 3k4
+###Morales Maria Elizabeth | 56030 | 3k4
+
 Acceso al [documento](https://frtutneduar-my.sharepoint.com/:b:/g/personal/franciscovicente_doc_frt_utn_edu_ar/IQD-5kaAARqnT5eL7EnPMCPgAX2LFXXX6e3p-u1C43z5rsQ?e=lbbpnz)
 
 Instrucciones:
