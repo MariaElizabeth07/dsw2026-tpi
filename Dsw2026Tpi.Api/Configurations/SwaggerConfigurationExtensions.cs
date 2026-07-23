@@ -16,10 +16,11 @@ public static class SwaggerConfigurationExtensions
             });
             o.AddSecurityDefinition(schemeId, new OpenApiSecurityScheme
             {
-                In = ParameterLocation.Header,
                 Name = "Authorization",
-                Description = "Ingrese el token JWT con el prefijo 'Bearer ' (ej: Bearer eyJhbG...)",
-                Type = SecuritySchemeType.ApiKey
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                Description = "Ingrese el token JWT con el prefijo 'Bearer ' (ej: Bearer eyJhbG...)"
             });
             o.AddSecurityRequirement(doc =>
             {
