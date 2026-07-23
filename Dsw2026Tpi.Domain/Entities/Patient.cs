@@ -4,8 +4,8 @@
     {
         public string UserId { get; init; }
         public string Dni { get; init; }
-        public string Nombre { get; init; }
-        public string? Telefono { get; private set; }
+        public string FullName { get; init; }
+        public string? Phone { get; private set; }
         public bool Deleted { get; private set; }
 
         #region Constructor for EF
@@ -19,14 +19,14 @@
         {
             UserId = userId;
             Dni = dni;
-            Nombre = Name;
-            Telefono = phone;
+            FullName = Name;
+            Phone = phone;
             Deleted = false;
         }
 
         public void UpdatePhone(string? phone)
         {
-            Telefono = phone;
+            Phone = phone;
         }
 
         public void Delete()

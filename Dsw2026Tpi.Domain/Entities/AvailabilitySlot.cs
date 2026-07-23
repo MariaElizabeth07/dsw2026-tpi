@@ -5,13 +5,13 @@ namespace Dsw2026Tpi.Domain.Entities
     public class AvailabilitySlot : EntityBase
     {
         public DateOnly SlotDate { get; init; }
-        public DateTime StartTime { get; init; }
-        public DateTime EndTime { get; init; }
+        public TimeOnly StartTime { get; init; }
+        public TimeOnly EndTime { get; init; }
         public SlotStatus Status { get; private set; }
-        public Guid DoctorId { get; set; }
+        public Guid DoctorId { get; init; }
         public Doctor? Doctor { get; private set; }
-        public Guid? AvailabilityRulesId { get; set; }
-        public AvailabilityRules? AvailabilityRules { get; private set; }
+        public Guid? AvailabilityRuleId { get; init; }
+        public AvailabilityRule? AvailabilityRule { get; private set; }
         public bool Deleted { get; private set; }
         public byte[]? RowVersion { get; set; }
 
@@ -23,16 +23,16 @@ namespace Dsw2026Tpi.Domain.Entities
 #pragma warning restore CS8618
         #endregion
 
-        public AvailabilitySlot(Doctor doctor, AvailabilityRules? availabilityRule, DateOnly slotDate,
-        DateTime startTime, DateTime endTime, Guid? id = null) : base(id)
+        public AvailabilitySlot(Doctor doctor, AvailabilityRule? availabilityRule, DateOnly slotDate,
+        TimeOnly startTime, TimeOnly endTime, Guid? id = null) : base(id)
         {
             if (startTime >= endTime)
                 throw new ArgumentException("La hora de inicio debe ser menor a la hora de fin.");
 
             Doctor = doctor;
             DoctorId = doctor.Id;
-            AvailabilityRules = availabilityRule;
-            AvailabilityRulesId = availabilityRule?.Id;
+            AvailabilityRule = availabilityRule;
+            AvailabilityRuleId = availabilityRule?.Id;
             SlotDate = slotDate;
             StartTime = startTime;
             EndTime = endTime;

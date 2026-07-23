@@ -18,11 +18,11 @@ public class PatientConfiguration : IEntityTypeConfiguration<Patient>
             .IsRequired()
             .HasMaxLength(10);
 
-        builder.Property(p => p.Nombre)
+        builder.Property(p => p.FullName)
             .IsRequired()
             .HasMaxLength(150);
 
-        builder.Property(p => p.Telefono)
+        builder.Property(p => p.Phone)
             .HasMaxLength(20);
 
         builder.HasIndex(p => p.UserId)

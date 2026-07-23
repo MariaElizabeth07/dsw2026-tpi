@@ -32,9 +32,9 @@ public class AvailabilitySlotConfiguration : IEntityTypeConfiguration<Availabili
             .HasForeignKey(s => s.DoctorId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(s => s.AvailabilityRules)
+        builder.HasOne(s => s.AvailabilityRule)
             .WithMany()
-            .HasForeignKey(s => s.AvailabilityRulesId)
+            .HasForeignKey(s => s.AvailabilityRuleId)
             .OnDelete(DeleteBehavior.SetNull);
 
         builder.HasIndex(s => new { s.DoctorId, s.SlotDate, s.StartTime })

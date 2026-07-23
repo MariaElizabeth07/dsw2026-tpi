@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Dsw2026Tpi.Data.Configurations;
 
-public class AvailabilityRuleConfiguration : IEntityTypeConfiguration<AvailabilityRules>
+public class AvailabilityRuleConfiguration : IEntityTypeConfiguration<AvailabilityRule>
 {
-    public void Configure(EntityTypeBuilder<AvailabilityRules> builder)
+    public void Configure(EntityTypeBuilder<AvailabilityRule> builder)
     {
         builder.ToTable("AvailabilityRules");
 
