@@ -235,7 +235,9 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Dni");
+                    b.HasIndex("Dni")
+                        .IsUnique()
+                        .HasFilter("[Deleted] = 0");
 
                     b.HasIndex("UserId")
                         .IsUnique();
