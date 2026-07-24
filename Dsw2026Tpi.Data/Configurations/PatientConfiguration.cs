@@ -28,7 +28,9 @@ public class PatientConfiguration : IEntityTypeConfiguration<Patient>
         builder.HasIndex(p => p.UserId)
             .IsUnique();
 
-        builder.HasIndex(p => p.Dni);
+        builder.HasIndex(p => p.Dni)
+            .IsUnique()
+            .HasFilter("[Deleted] = 0");
 
         builder.HasQueryFilter(p => !p.Deleted);
     }

@@ -88,6 +88,15 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ya existe un paciente con ese DNI.
+        /// </summary>
+        public static string PATIENT_DNI_ALREADY_EXISTS {
+            get {
+                return ResourceManager.GetString("PATIENT_DNI_ALREADY_EXISTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Se produjo un error al registrar el usuario.
         /// </summary>
         public static string REGISTER_USER_CONFLICT {

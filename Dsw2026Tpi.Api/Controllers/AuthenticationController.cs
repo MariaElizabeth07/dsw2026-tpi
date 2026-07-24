@@ -35,4 +35,16 @@ public class AuthenticationController : AppController
         var result = await _authenticationService.LoginAdmin(request);
         return Ok(result);
     }
+
+    [HttpPost("patient/login")]
+    [EnableRateLimiting(RateLimitingConfigurationExtensions.AuthLoginPolicy)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+    public async Task<IActionResult> LoginPatient([FromBody] LoginPatientModel.Request request)
+    {
+        var result = await _authenticationService.LoginPatient(request);
+        return Ok(result);
+    }
 }
