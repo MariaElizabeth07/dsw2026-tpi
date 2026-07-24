@@ -4,7 +4,7 @@ public class Speciality: EntityBase
 {
     public string Name { get; init; }
     public string Description { get; init; }
-
+    public bool Deleted { get; private set; }
     #region Constructor for EF
 #pragma warning disable CS8618
     private Speciality() { }
@@ -15,5 +15,10 @@ public class Speciality: EntityBase
     {
         Name = name;
         Description = description;
+        Deleted = false;
+    }
+    public void Delete()
+    {
+        Deleted = true;
     }
 }
