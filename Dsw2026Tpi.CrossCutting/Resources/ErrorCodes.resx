@@ -129,6 +129,9 @@
   <data name="PATIENT_DNI_ALREADY_EXISTS" xml:space="preserve">
     <value>Ya existe un paciente con ese DNI</value>
   </data>
+  <data name="SPECIALITY_NAME_ALREADY_EXISTS" xml:space="preserve">
+    <value>Ya existe una especialidad con ese nombre</value>
+  </data>
   <data name="REGISTER_USER_CONFLICT" xml:space="preserve">
     <value>Se produjo un error al registrar el usuario</value>
   </data>
