@@ -10,10 +10,12 @@ namespace Dsw2026Tpi.Application.Services;
 public class DoctorService : IDoctorService
 {
     private readonly IPersistence _persistence;
+    private readonly IAvailabilityService _availabilityService;
 
-    public DoctorService(IPersistence persistence)
+    public DoctorService(IPersistence persistence, IAvailabilityService availabilityService)
     {
         _persistence = persistence;
+        _availabilityService = availabilityService;
     }
 
     public async Task<Pagination<DoctorModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null)
@@ -70,6 +72,11 @@ public class DoctorService : IDoctorService
 
         doctor.Deactivate();
         await _persistence.Update(doctor);
+    }
+
+    public Task<IReadOnlyCollection<AvailabilityModel.Response>> GetAvailabilities(Guid id)
+    {
+        return _availabilityService.GetByDoctor(id);
     }
 
     private async Task EnsureLicenseNumberIsUnique(string licenseNumber, Guid? doctorId = null)

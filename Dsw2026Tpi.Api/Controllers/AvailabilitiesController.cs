@@ -1,0 +1,41 @@
+using Dsw2026Tpi.Application.Dtos;
+using Dsw2026Tpi.Application.Interfaces;
+using Dsw2026Tpi.CrossCutting.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Dsw2026Tpi.Api.Controllers;
+
+[Route("availabilities")]
+[Authorize(Policy = Policies.AdminPolicy)]
+public class AvailabilitiesController : AppController
+{
+    private readonly IAvailabilityService _service;
+
+    public AvailabilitiesController(IAvailabilityService service)
+    {
+        _service = service;
+    }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Create([FromBody] AvailabilityModel.Request request)
+    {
+        var response = await _service.Create(request);
+        return Ok(response);
+    }
+
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Update([FromBody] AvailabilityModel.Request request)
+    {
+        var response = await _service.Update(request);
+        return Ok(response);
+    }
+}

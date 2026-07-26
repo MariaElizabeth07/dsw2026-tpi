@@ -29,8 +29,8 @@
             Month = month;
             Year = year;
             DayOfWeek = dayOfWeek;
-            StartTime = StartTime;
-            EndTime = EndTime;
+            StartTime = startTime;
+            EndTime = endTime;
             Deleted = false;
         }
 
