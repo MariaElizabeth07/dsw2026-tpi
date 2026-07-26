@@ -2,10 +2,10 @@
 
 public class Doctor: EntityBase
 {
-    public string Name { get; init; }
-    public string LicenseNumber { get; init; }
+    public string Name { get; private set; }
+    public string LicenseNumber { get; private set; }
     public bool IsActive { get; private set; }
-    public Guid? SpecialityId { get; set; }
+    public Guid? SpecialityId { get; private set; }
     public Speciality? Speciality { get; private set; }
 
     #region Constructor for EF
@@ -22,6 +22,14 @@ public class Doctor: EntityBase
         LicenseNumber = licenseNumber;
         Speciality = speciality;
         IsActive = true;
+    }
+
+    public void Update(string name, string licenseNumber, Speciality speciality)
+    {
+        Name = name;
+        LicenseNumber = licenseNumber;
+        Speciality = speciality;
+        SpecialityId = speciality.Id;
     }
 
     public void Deactivate()
