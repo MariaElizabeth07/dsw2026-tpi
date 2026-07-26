@@ -78,21 +78,39 @@ public class AvailabilityService : IAvailabilityService
         foreach (var slot in existingSlots)
         {
             slot.Delete();
-            await _persistence.Update(slot);
+        }
+        if (existingSlots.Count != 0)
+        {
+            await _persistence.UpdateRange(existingSlots);
         }
 
         foreach (var rule in existingRules)
         {
             rule.Delete();
-            await _persistence.Update(rule);
+        }
+        if (existingRules.Count != 0)
+        {
+            await _persistence.UpdateRange(existingRules);
         }
 
         var createdRules = new List<AvailabilityRule>();
         foreach (var day in normalizedDays)
         {
             var rule = new AvailabilityRule(doctor, context.Month, context.Year, day.DayOfWeek, day.StartTime, day.EndTime);
-            await _persistence.Add(rule);
             createdRules.Add(rule);
+        }
+        if (createdRules.Count != 0)
+        {
+            await _persistence.AddRange(createdRules);
+        }
+
+        foreach (var day in normalizedDays)
+        {
+            var rule = createdRules.First(createdRule =>
+                createdRule.DayOfWeek == day.DayOfWeek &&
+                createdRule.StartTime == day.StartTime &&
+                createdRule.EndTime == day.EndTime);
+
             await EnsureSlotsExist(doctor, rule, day, context);
         }
 
@@ -130,6 +148,7 @@ public class AvailabilityService : IAvailabilityService
                 slot.SlotDate >= context.StartDate &&
                 slot.SlotDate <= context.EndDate))
             ?.ToList() ?? [];
+        var newSlots = new List<AvailabilitySlot>();
 
         var dates = DateTimeHelper.GetDatesForDay(day.DayOfWeek, context.StartDate, context.EndDate);
         var intervals = DateTimeHelper.BuildThirtyMinuteIntervals(day.StartTime, day.EndTime);
@@ -149,9 +168,14 @@ public class AvailabilityService : IAvailabilityService
                 }
 
                 var slot = new AvailabilitySlot(doctor, rule, date, interval.StartTime, interval.EndTime);
-                await _persistence.Add(slot);
+                newSlots.Add(slot);
                 monthSlots.Add(slot);
             }
+        }
+
+        if (newSlots.Count != 0)
+        {
+            await _persistence.AddRange(newSlots);
         }
     }
 
