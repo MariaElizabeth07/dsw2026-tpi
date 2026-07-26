@@ -2,6 +2,8 @@ using System.Globalization;
 using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.CrossCutting.Exceptions;
+using Dsw2026Tpi.CrossCutting.Helpers;
+using Dsw2026Tpi.CrossCutting.Resources;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Enums;
 using Dsw2026Tpi.Domain.Interfaces;
@@ -10,30 +12,6 @@ namespace Dsw2026Tpi.Application.Services;
 
 public class AvailabilityService : IAvailabilityService
 {
-    private const string AvailabilityHasBookedSlotsErrorCode = "AVAILABILITY_HAS_BOOKED_SLOTS";
-    private const string AvailabilityHasBookedSlotsMessage = "No se puede sobrescribir la disponibilidad porque existen turnos reservados en el mes actual.";
-    private const string AvailabilityOverlapErrorCode = "AVAILABILITY_OVERLAP";
-    private const string AvailabilityOverlapMessage = "No se permiten horarios solapados para el mismo médico.";
-    private static readonly Dictionary<string, DayOfWeek> SupportedDays = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["LUNES"] = DayOfWeek.Monday,
-        ["MARTES"] = DayOfWeek.Tuesday,
-        ["MIERCOLES"] = DayOfWeek.Wednesday,
-        ["MIÉRCOLES"] = DayOfWeek.Wednesday,
-        ["JUEVES"] = DayOfWeek.Thursday,
-        ["VIERNES"] = DayOfWeek.Friday,
-        ["SABADO"] = DayOfWeek.Saturday,
-        ["SÁBADO"] = DayOfWeek.Saturday,
-        ["DOMINGO"] = DayOfWeek.Sunday,
-        ["MONDAY"] = DayOfWeek.Monday,
-        ["TUESDAY"] = DayOfWeek.Tuesday,
-        ["WEDNESDAY"] = DayOfWeek.Wednesday,
-        ["THURSDAY"] = DayOfWeek.Thursday,
-        ["FRIDAY"] = DayOfWeek.Friday,
-        ["SATURDAY"] = DayOfWeek.Saturday,
-        ["SUNDAY"] = DayOfWeek.Sunday,
-    };
-
     private readonly IPersistence _persistence;
 
     public AvailabilityService(IPersistence persistence)
@@ -43,7 +21,7 @@ public class AvailabilityService : IAvailabilityService
 
     public async Task<IReadOnlyCollection<AvailabilityModel.Response>> Create(AvailabilityModel.Request request)
     {
-        var context = BuildMonthContext();
+        var context = DateTimeHelper.GetCurrentMonthRangeFromToday();
         var normalizedDays = NormalizeRequest(request);
         var doctor = await GetDoctor(request.DoctorId);
 
@@ -75,7 +53,7 @@ public class AvailabilityService : IAvailabilityService
 
     public async Task<IReadOnlyCollection<AvailabilityModel.Response>> Update(AvailabilityModel.Request request)
     {
-        var context = BuildMonthContext();
+        var context = DateTimeHelper.GetCurrentMonthRangeFromToday();
         var normalizedDays = NormalizeRequest(request);
         ValidateOverlaps([], normalizedDays);
 
@@ -92,7 +70,9 @@ public class AvailabilityService : IAvailabilityService
 
         if (existingSlots.Any(slot => slot.Status == SlotStatus.Booked))
         {
-            throw new ConflictException(AvailabilityHasBookedSlotsErrorCode, AvailabilityHasBookedSlotsMessage);
+            throw new ConflictException(
+                nameof(ErrorCodes.AVAILABILITY_HAS_BOOKED_SLOTS),
+                ErrorCodes.AVAILABILITY_HAS_BOOKED_SLOTS);
         }
 
         foreach (var slot in existingSlots)
@@ -122,7 +102,7 @@ public class AvailabilityService : IAvailabilityService
     public async Task<IReadOnlyCollection<AvailabilityModel.Response>> GetByDoctor(Guid doctorId)
     {
         _ = await GetDoctor(doctorId);
-        var context = BuildMonthContext();
+        var context = DateTimeHelper.GetCurrentMonthRangeFromToday();
 
         var rules = (await _persistence.GetFiltered<AvailabilityRule>(
             rule => rule.DoctorId == doctorId && rule.Year == context.Year && rule.Month == context.Month))
@@ -143,7 +123,7 @@ public class AvailabilityService : IAvailabilityService
             ?? throw new EntityNotFoundException(nameof(Doctor));
     }
 
-    private async Task EnsureSlotsExist(Doctor doctor, AvailabilityRule rule, NormalizedDayRequest day, MonthContext context)
+    private async Task EnsureSlotsExist(Doctor doctor, AvailabilityRule rule, NormalizedDayRequest day, MonthRange context)
     {
         var monthSlots = (await _persistence.GetFiltered<AvailabilitySlot>(
             slot => slot.DoctorId == doctor.Id &&
@@ -151,9 +131,12 @@ public class AvailabilityService : IAvailabilityService
                 slot.SlotDate <= context.EndDate))
             ?.ToList() ?? [];
 
-        foreach (var date in GetDatesForDay(day.DayOfWeek, context.StartDate, context.EndDate))
+        var dates = DateTimeHelper.GetDatesForDay(day.DayOfWeek, context.StartDate, context.EndDate);
+        var intervals = DateTimeHelper.BuildThirtyMinuteIntervals(day.StartTime, day.EndTime);
+
+        foreach (var date in dates)
         {
-            foreach (var interval in BuildIntervals(day.StartTime, day.EndTime))
+            foreach (var interval in intervals)
             {
                 var exists = monthSlots.Any(slot =>
                     slot.SlotDate == date &&
@@ -200,7 +183,7 @@ public class AvailabilityService : IAvailabilityService
         {
             var fieldPrefix = $"{nameof(request.Days)}[{index}]";
 
-            if (string.IsNullOrWhiteSpace(day.Day) || !TryParseDay(day.Day, out var dayOfWeek))
+            if (!DateTimeHelper.TryParseSupportedDay(day.Day, out var dayOfWeek))
             {
                 exception.WithDetail($"{fieldPrefix}.day", "El día indicado no es válido.");
             }
@@ -222,7 +205,7 @@ public class AvailabilityService : IAvailabilityService
                 exception.WithDetail($"{fieldPrefix}.startTime", "startTime debe ser menor a endTime.");
             }
 
-            if (startTimeOk && endTimeOk && TryParseDay(day.Day, out dayOfWeek))
+            if (startTimeOk && endTimeOk && DateTimeHelper.TryParseSupportedDay(day.Day, out dayOfWeek))
             {
                 normalizedDays.Add(new NormalizedDayRequest(dayOfWeek, startTime, endTime));
             }
@@ -265,44 +248,10 @@ public class AvailabilityService : IAvailabilityService
 
         if (overlap)
         {
-            throw new ConflictException(AvailabilityOverlapErrorCode, AvailabilityOverlapMessage);
+            throw new ConflictException(
+                nameof(ErrorCodes.AVAILABILITY_OVERLAP),
+                ErrorCodes.AVAILABILITY_OVERLAP);
         }
-    }
-
-    private static IEnumerable<DateOnly> GetDatesForDay(DayOfWeek dayOfWeek, DateOnly startDate, DateOnly endDate)
-    {
-        var current = startDate;
-        while (current.DayOfWeek != dayOfWeek && current <= endDate)
-        {
-            current = current.AddDays(1);
-        }
-
-        while (current <= endDate)
-        {
-            yield return current;
-            current = current.AddDays(7);
-        }
-    }
-
-    private static IEnumerable<(TimeOnly StartTime, TimeOnly EndTime)> BuildIntervals(TimeOnly startTime, TimeOnly endTime)
-    {
-        var cursor = startTime;
-        while (cursor < endTime)
-        {
-            var next = cursor.AddMinutes(30);
-            if (next > endTime)
-            {
-                yield break;
-            }
-
-            yield return (cursor, next);
-            cursor = next;
-        }
-    }
-
-    private static bool TryParseDay(string input, out DayOfWeek dayOfWeek)
-    {
-        return SupportedDays.TryGetValue(input.Trim(), out dayOfWeek);
     }
 
     private static string ToSpanishDay(DayOfWeek dayOfWeek)
@@ -335,15 +284,5 @@ public class AvailabilityService : IAvailabilityService
         };
     }
 
-    private static MonthContext BuildMonthContext()
-    {
-        var today = DateOnly.FromDateTime(DateTime.Today);
-        var monthStartDate = new DateOnly(today.Year, today.Month, 1);
-        var endDate = new DateOnly(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month));
-        return new MonthContext(today.Year, today.Month, monthStartDate, today, endDate);
-    }
-
     private sealed record NormalizedDayRequest(DayOfWeek DayOfWeek, TimeOnly StartTime, TimeOnly EndTime);
-
-    private sealed record MonthContext(int Year, int Month, DateOnly MonthStartDate, DateOnly StartDate, DateOnly EndDate);
 }
