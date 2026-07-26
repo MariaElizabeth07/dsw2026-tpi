@@ -1,4 +1,4 @@
-using Dsw2026Tpi.CrossCutting.Exceptions;
+﻿using Dsw2026Tpi.CrossCutting.Exceptions;
 using Dsw2026Tpi.CrossCutting.Models;
 using Dsw2026Tpi.CrossCutting.Resources;
 using System.Net;
@@ -32,16 +32,15 @@ public class ExceptionHandlingMiddleware
 
     private async Task HandleExceptionAsync(HttpContext context, Exception ex)
     {
-        ErrorResponse error = ex is AppException exApp
-            ? exApp.Error
-            : new ErrorResponse(nameof(ErrorCodes.UNHANDLED_ERROR), ErrorCodes.UNHANDLED_ERROR);
+        ErrorResponse error = ex is AppException exApp ? 
+            exApp.Error : 
+            new ErrorResponse(nameof(ErrorCodes.UNHANDLED_ERROR), ErrorCodes.UNHANDLED_ERROR);
         var status = ex switch
         {
             ValidationException => HttpStatusCode.BadRequest,
             EntityNotFoundException => HttpStatusCode.NotFound,
-            ConflictException => HttpStatusCode.Conflict,
-            AuthenticationException => HttpStatusCode.Unauthorized,
-            AuthorizationException => HttpStatusCode.Forbidden,
+            ConflictException or AuthenticationException => HttpStatusCode.Conflict,
+            AuthorizationException => HttpStatusCode.Unauthorized,
             _ => HttpStatusCode.InternalServerError,
         };
         var result = JsonSerializer.Serialize(error);

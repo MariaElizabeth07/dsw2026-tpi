@@ -126,12 +126,6 @@
   <data name="ENTITY_NOTFOUND" xml:space="preserve">
     <value>La entidad {0} no se encontró</value>
   </data>
-  <data name="PATIENT_DNI_ALREADY_EXISTS" xml:space="preserve">
-    <value>Ya existe un paciente con ese DNI</value>
-  </data>
-  <data name="SPECIALITY_NAME_ALREADY_EXISTS" xml:space="preserve">
-    <value>Ya existe una especialidad con ese nombre</value>
-  </data>
   <data name="REGISTER_USER_CONFLICT" xml:space="preserve">
     <value>Se produjo un error al registrar el usuario</value>
   </data>
@@ -143,8 +137,5 @@
   </data>
   <data name="VALIDATION_ERROR" xml:space="preserve">
     <value>Uno o más errores de validación ocurrieron</value>
-  </data>
-  <data name="DOCTOR_LICENSE_ALREADY_EXISTS" xml:space="preserve">
-    <value>Ya existe un médico con ese número de matrícula</value>
   </data>
 </root>

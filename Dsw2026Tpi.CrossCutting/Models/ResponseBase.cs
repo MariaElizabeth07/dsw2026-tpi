@@ -1,19 +1,12 @@
-using System.Text.Json.Serialization;
+﻿namespace Dsw2026Tpi.CrossCutting.Models;
 
-namespace Dsw2026Tpi.CrossCutting.Models;
-
-public record ErrorResponse(
-    [property: JsonPropertyName("errorCode")] string ErrorCode,
-    [property: JsonPropertyName("message")] string Message)
+public record ErrorResponse(string ErrorCode, string Message)
 {
-    [JsonPropertyName("details")]
     public ICollection<ErrorDetail> Details { get; } = [];
-
     public void AddDetail(string field, string issue)
     {
         Details.Add(new ErrorDetail(field, issue));
     }
-
     public void AddDetail(IEnumerable<(string, string)> details)
     {
         foreach (var detail in details)
@@ -22,7 +15,4 @@ public record ErrorResponse(
         }
     }
 }
-
-public record ErrorDetail(
-    [property: JsonPropertyName("field")] string Field,
-    [property: JsonPropertyName("issue")] string Issue);
+public record ErrorDetail(string Field, string Issue);

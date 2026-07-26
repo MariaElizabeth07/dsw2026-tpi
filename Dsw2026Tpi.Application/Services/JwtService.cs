@@ -1,5 +1,4 @@
-using Dsw2026Tpi.Data.Identity;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -15,8 +14,9 @@ public class JwtService
         _config = config;
     }
 
-    public string GenerateToken(ApplicationUser user, string? role)
+    public string GenerateToken(string username, string? role)
     {
+        if (_config == null) throw new ArgumentNullException();
         var jwtConfig = _config.GetSection("Jwt");
         var keyText = jwtConfig["Key"] ?? throw new ArgumentNullException("Jwt Key");
         var issuer = jwtConfig["Issuer"] ?? throw new ArgumentNullException("Jwt Issuer");
@@ -27,20 +27,21 @@ public class JwtService
 
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Email ?? user.UserName ?? user.Id),
-            new Claim(ClaimTypes.Name, user.Email ?? user.UserName ?? user.Id),
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim(ClaimTypes.Role, role ?? string.Empty),
-            new Claim("security_stamp", user.SecurityStamp ?? string.Empty)
+            new Claim(JwtRegisteredClaimNames.Sub, username),
+            new Claim(ClaimTypes.Name, username),
+            new Claim(ClaimTypes.Role, role ?? string.Empty)
         };
 
         var token = new JwtSecurityToken(
             issuer: issuer,
             audience: audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(expiresIn),
-            signingCredentials: creds);
+            expires: DateTime.Now.AddMinutes(expiresIn),
+            signingCredentials: creds
+            );
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+        return tokenString;
     }
 }
