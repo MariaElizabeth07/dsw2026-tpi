@@ -144,4 +144,7 @@
   <data name="VALIDATION_ERROR" xml:space="preserve">
     <value>Uno o más errores de validación ocurrieron</value>
   </data>
+  <data name="DOCTOR_LICENSE_ALREADY_EXISTS" xml:space="preserve">
+    <value>Ya existe un médico con ese número de matrícula</value>
+  </data>
 </root>
