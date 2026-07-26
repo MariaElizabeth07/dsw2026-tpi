@@ -1,4 +1,4 @@
-﻿using Dsw2026Tpi.Application.Dtos;
+using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.CrossCutting.Identity;
 using Microsoft.AspNetCore.Authorization;
@@ -6,13 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2026Tpi.Api.Controllers;
 
-[Route("doctors")]
+[Route("specialties")]
 [Authorize(Policy = Policies.AdminPolicy)]
-public class DoctorController : AppController
+public class SpecialtiesController : AppController
 {
-    private readonly IDoctorService _service;
+    private readonly ISpecialityService _service;
 
-    public DoctorController(IDoctorService service)
+    public SpecialtiesController(ISpecialityService service)
     {
         _service = service;
     }
@@ -20,21 +20,20 @@ public class DoctorController : AppController
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetAll([FromQuery]int pageSize, [FromQuery]int pageIndex, [FromQuery]string? name = null)
+    public async Task<IActionResult> GetAll([FromQuery] int pageSize, [FromQuery] int pageIndex, [FromQuery] string? name = null)
     {
-        var doctors = await _service.GetAll(pageSize, pageIndex, name);
-        return Ok(doctors);
+        var specialties = await _service.GetAll(pageSize, pageIndex, name);
+        return Ok(specialties);
     }
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> Create([FromBody] DoctorModel.Request request)
+    public async Task<IActionResult> Create([FromBody] SpecialityModel.Request request)
     {
-        var doctor = await _service.Create(request);
-        return Ok(doctor);
+        var speciality = await _service.Create(request);
+        return Ok(speciality);
     }
 
     [HttpPut("{id:guid}")]
@@ -42,10 +41,10 @@ public class DoctorController : AppController
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] DoctorModel.Request request)
+    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] SpecialityModel.Request request)
     {
-        var doctor = await _service.Update(id, request);
-        return Ok(doctor);
+        var speciality = await _service.Update(id, request);
+        return Ok(speciality);
     }
 
     [HttpDelete("{id:guid}")]
