@@ -153,4 +153,16 @@
   <data name="AVAILABILITY_OVERLAP" xml:space="preserve">
     <value>No se permiten horarios solapados para el mismo médico</value>
   </data>
+  <data name="APPOINTMENT_SLOT_NOT_AVAILABLE" xml:space="preserve">
+    <value>El turno seleccionado no está disponible</value>
+  </data>
+  <data name="APPOINTMENT_SLOT_IN_PAST" xml:space="preserve">
+    <value>No se pueden reservar turnos en el pasado</value>
+  </data>
+  <data name="APPOINTMENT_CONFLICT" xml:space="preserve">
+    <value>El turno ya fue reservado por otro paciente</value>
+  </data>
+  <data name="APPOINTMENT_NOT_CANCELABLE" xml:space="preserve">
+    <value>Solo se pueden cancelar turnos en estado reservado</value>
+  </data>
 </root>

@@ -61,20 +61,38 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a No se puede sobrescribir la disponibilidad porque existen turnos reservados en el mes actual.
+        ///   Busca una cadena traducida similar a El turno ya fue reservado por otro paciente.
         /// </summary>
-        public static string AVAILABILITY_HAS_BOOKED_SLOTS {
+        public static string APPOINTMENT_CONFLICT {
             get {
-                return ResourceManager.GetString("AVAILABILITY_HAS_BOOKED_SLOTS", resourceCulture);
+                return ResourceManager.GetString("APPOINTMENT_CONFLICT", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a No se permiten horarios solapados para el mismo médico.
+        ///   Busca una cadena traducida similar a Solo se pueden cancelar turnos en estado reservado.
         /// </summary>
-        public static string AVAILABILITY_OVERLAP {
+        public static string APPOINTMENT_NOT_CANCELABLE {
             get {
-                return ResourceManager.GetString("AVAILABILITY_OVERLAP", resourceCulture);
+                return ResourceManager.GetString("APPOINTMENT_NOT_CANCELABLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No se pueden reservar turnos en el pasado.
+        /// </summary>
+        public static string APPOINTMENT_SLOT_IN_PAST {
+            get {
+                return ResourceManager.GetString("APPOINTMENT_SLOT_IN_PAST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a El turno seleccionado no está disponible.
+        /// </summary>
+        public static string APPOINTMENT_SLOT_NOT_AVAILABLE {
+            get {
+                return ResourceManager.GetString("APPOINTMENT_SLOT_NOT_AVAILABLE", resourceCulture);
             }
         }
         
@@ -93,6 +111,24 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         public static string AUTHORIZATION_FAILED {
             get {
                 return ResourceManager.GetString("AUTHORIZATION_FAILED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No se puede sobrescribir la disponibilidad porque existen turnos reservados en el mes actual.
+        /// </summary>
+        public static string AVAILABILITY_HAS_BOOKED_SLOTS {
+            get {
+                return ResourceManager.GetString("AVAILABILITY_HAS_BOOKED_SLOTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No se permiten horarios solapados para el mismo médico.
+        /// </summary>
+        public static string AVAILABILITY_OVERLAP {
+            get {
+                return ResourceManager.GetString("AVAILABILITY_OVERLAP", resourceCulture);
             }
         }
         
