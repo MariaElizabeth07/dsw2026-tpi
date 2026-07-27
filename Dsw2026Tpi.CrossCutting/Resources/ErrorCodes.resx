@@ -147,4 +147,10 @@
   <data name="DOCTOR_LICENSE_ALREADY_EXISTS" xml:space="preserve">
     <value>Ya existe un médico con ese número de matrícula</value>
   </data>
+  <data name="AVAILABILITY_HAS_BOOKED_SLOTS" xml:space="preserve">
+    <value>No se puede sobrescribir la disponibilidad porque existen turnos reservados en el mes actual</value>
+  </data>
+  <data name="AVAILABILITY_OVERLAP" xml:space="preserve">
+    <value>No se permiten horarios solapados para el mismo médico</value>
+  </data>
 </root>
