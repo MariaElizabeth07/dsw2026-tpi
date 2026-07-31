@@ -66,7 +66,7 @@ public static class SecurityConfigurationExtensions
                         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                         context.Response.ContentType = "application/json";
                         var response = JsonSerializer.Serialize(
-                            new ErrorResponse("UNAUTHORIZED", "Se requiere un token válido para acceder al recurso."));
+                            new ErrorResponse(nameof(ErrorCodes.AUTHENTICATION_MISSING_TOKEN), ErrorCodes.AUTHENTICATION_MISSING_TOKEN));
                         await context.Response.WriteAsync(response);
                     },
                     OnForbidden = async context =>
@@ -135,7 +135,7 @@ public static class SecurityConfigurationExtensions
         {
             options.Password = new PasswordOptions
             {
-                RequiredLength = 6,
+                RequiredLength = 8,
                 RequireLowercase = true,
                 RequireUppercase = true,
                 RequireDigit = true

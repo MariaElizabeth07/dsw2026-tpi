@@ -52,12 +52,6 @@ public class Program
             app.UseAuthentication();
             app.UseAuthorization();
 
-            using (var scope = app.Services.CreateScope())
-            {
-                var adminSeedService = scope.ServiceProvider.GetRequiredService<IAdminSeedService>();
-                await adminSeedService.EnsureSeededAsync();
-            }
-
             app.MapControllers();
             app.MapHealthChecks("/health-check");
 

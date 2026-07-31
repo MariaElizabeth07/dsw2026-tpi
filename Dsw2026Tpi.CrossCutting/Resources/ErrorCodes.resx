@@ -165,4 +165,7 @@
   <data name="APPOINTMENT_NOT_CANCELABLE" xml:space="preserve">
     <value>Solo se pueden cancelar turnos en estado reservado</value>
   </data>
+  <data name="AUTHENTICATION_MISSING_TOKEN" xml:space="preserve">
+    <value>Se necesita un token valido para acceder al recurso</value>
+  </data>
 </root>
