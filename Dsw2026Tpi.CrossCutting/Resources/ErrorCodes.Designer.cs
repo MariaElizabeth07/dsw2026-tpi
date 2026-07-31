@@ -106,6 +106,15 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Se necesita un token valido para acceder al recurso.
+        /// </summary>
+        public static string AUTHENTICATION_MISSING_TOKEN {
+            get {
+                return ResourceManager.GetString("AUTHENTICATION_MISSING_TOKEN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Se requieren permisos para la operación solicitada.
         /// </summary>
         public static string AUTHORIZATION_FAILED {
