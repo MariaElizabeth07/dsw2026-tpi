@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace Dsw2026Tpi.Api.Controllers;
 
-[Route("auth")]
+[Route("api/auth")]
 public class AuthenticationController : AppController
 {
     private readonly IAuthenticationService _authenticationService;
