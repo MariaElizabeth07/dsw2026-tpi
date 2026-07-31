@@ -1,3 +1,4 @@
+using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.Data.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -7,7 +8,7 @@ using System.Text;
 
 namespace Dsw2026Tpi.Application.Services;
 
-public class JwtService
+public class JwtService : IJwtService
 {
     private readonly IConfiguration _config;
     public JwtService(IConfiguration config)

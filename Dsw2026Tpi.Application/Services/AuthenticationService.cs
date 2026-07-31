@@ -16,14 +16,14 @@ public class AuthenticationService : IAuthenticationService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ISignInService _signInManager;
-    private readonly JwtService _jwtService;
+    private readonly IJwtService _jwtService;
     private readonly IPersistence _persistence;
     private readonly ILogger<AuthenticationService> _logger;
 
     public AuthenticationService(
         UserManager<ApplicationUser> userManager,
         ISignInService signInManager,
-        JwtService jwtService,
+        IJwtService jwtService,
         IPersistence persistence,
         ILogger<AuthenticationService> logger)
     {
@@ -50,26 +50,17 @@ public class AuthenticationService : IAuthenticationService
 
         var dni = request.Dni.ToString();
         var user = await _userManager.FindByEmailAsync(request.Email);
+
         if (user is not null && user.Deleted)
         {
-            throw new AuthenticationException();
+            _logger.LogInformation("Patient login failed due to user {Email} is deleted.", request.Email);
+            throw new AuthenticationException().WithDetail(nameof(request.Email), "El usuario está eliminado.");
         }
 
-        var patientByUser = user is null
-            ? null
-            : await _persistence.First<Patient>(p => p.UserId == user.Id);
-        var patientByDni = await _persistence.First<Patient>(p => p.Dni == dni);
-
-        if (patientByDni is not null && (patientByUser is null || patientByDni.UserId != patientByUser.UserId))
+        if (user is not null && (user.Dni != dni || (user.Dni == dni && user.Email != request.Email)))
         {
-            throw new ConflictException(nameof(ErrorCodes.PATIENT_DNI_ALREADY_EXISTS), ErrorCodes.PATIENT_DNI_ALREADY_EXISTS)
-                .WithDetail(nameof(request.Dni), "El DNI ya está asociado a otro paciente.");
-        }
-
-        if (patientByUser is not null && !string.Equals(patientByUser.Dni, dni, StringComparison.Ordinal))
-        {
-            _logger.LogWarning("Patient login failed due to DNI mismatch for email {Email}.", request.Email);
-            throw new AuthenticationException();
+            _logger.LogInformation("Patient login failed due to DNI or Email mismatch for email {Email} and DNI {Dni}.", request.Email, request.Dni);
+            throw new AuthenticationException().WithDetail(nameof(request.Email), "El DNI o el email ingresados no coinciden.");
         }
 
         if (user is null)
@@ -78,6 +69,7 @@ public class AuthenticationService : IAuthenticationService
             {
                 UserName = request.Email,
                 Email = request.Email,
+                Dni = dni,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -90,11 +82,12 @@ public class AuthenticationService : IAuthenticationService
             }
         }
 
-        var patient = patientByUser;
-        if (patient is null)
+        var patientEntity = await _persistence.First<Patient>(patient => patient.Dni == user.Dni);
+
+        if (patientEntity is null)
         {
-            patient = new Patient(user.Id, dni, request.Email);
-            await _persistence.Add(patient);
+            patientEntity = new Patient(user.Id, dni, request.Email);
+            await _persistence.Add<Patient>(patientEntity);
         }
 
         if (!await _userManager.IsInRoleAsync(user, Roles.Patient))
@@ -128,22 +121,22 @@ public class AuthenticationService : IAuthenticationService
                 .WithDetail(nameof(request.Password), "La contraseña debe tener al menos 8 caracteres.");
         }
 
-        var user = await _userManager.FindByEmailAsync(request.Email) ?? throw new AuthenticationException();
+        var user = await _userManager.FindByEmailAsync(request.Email) ?? throw new AuthenticationException().WithDetail(nameof(request.Email), "El usuario no existe.");
         if (user.Deleted)
         {
-            throw new AuthenticationException();
+            throw new AuthenticationException().WithDetail(nameof(request.Email), "El usuario está eliminado.");
         }
 
         var result = await _signInManager.CheckPassword(user, request.Password);
         if (!result)
         {
             _logger.LogWarning("Admin login failed.");
-            throw new AuthenticationException();
+            throw new AuthenticationException().WithDetail(nameof(request.Password), "La contraseña es incorrecta.");
         }
 
         if (!await _userManager.IsInRoleAsync(user, Roles.Administrator))
         {
-            throw new AuthorizationException();
+            throw new AuthorizationException().WithDetail(nameof(request.Email), "El usuario no tiene permisos suficientes.");
         }
 
         var token = _jwtService.GenerateToken(user, Roles.Administrator);
