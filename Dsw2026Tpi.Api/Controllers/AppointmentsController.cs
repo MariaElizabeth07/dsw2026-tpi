@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2026Tpi.Api.Controllers;
 
-[Route("appointments")]
+[Route("api/appointments")]
 [Authorize(Policy = Policies.PatientPolicy)]
 public class AppointmentsController : AppController
 {
