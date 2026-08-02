@@ -1,9 +1,11 @@
 ﻿using System.Security.Claims;
 using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Application.Interfaces;
+using Dsw2026Tpi.Api.Configurations;
 using Dsw2026Tpi.CrossCutting.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Dsw2026Tpi.Api.Controllers;
 
@@ -24,6 +26,8 @@ public class AppointmentsController : AppController
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+    [EnableRateLimiting(RateLimitingConfigurationExtensions.AppointmentBookingPolicy)]
     public async Task<IActionResult> Create([FromBody] AppointmentModel.Request request)
     {
         var response = await _service.Create(request, GetAuthenticatedEmail());
