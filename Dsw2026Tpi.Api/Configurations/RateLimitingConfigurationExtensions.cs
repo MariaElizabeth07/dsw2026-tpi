@@ -28,9 +28,9 @@ public static class RateLimitingConfigurationExtensions
                     .CreateLogger("RateLimiting");
 
                 logger.LogWarning(
-                    "Solicitud rechazada por rate limiting. Policy: {PolicyName}. Path: {Path}. PartitionKey: {PartitionKey}",
-                    context.RateLimitPolicy,
+                    "Solicitud rechazada por rate limiting. Path: {Path}. Method: {Method}. PartitionKey: {PartitionKey}",
                     context.HttpContext.Request.Path,
+                    context.HttpContext.Request.Method,
                     GetUserOrIpPartitionKey(context.HttpContext));
 
                 context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
