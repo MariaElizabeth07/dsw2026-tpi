@@ -24,7 +24,7 @@ public class Program
             builder.AddSerilogConfiguration();
             builder.Services.AddAppIdentity();
             builder.Services.AddAppAuthentication(builder.Configuration);
-            builder.Services.AddAppRateLimiting();
+            builder.Services.AddAppRateLimiting(builder.Configuration);
             builder.Services.AddSwaggerConfiguration();
             builder.Services.AddApplicationPersistence(builder.Configuration);
             builder.Services.AddAppCors(builder.Configuration);
@@ -47,9 +47,10 @@ public class Program
             }
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
+            app.UseRouting();
             app.UseCors();
-            app.UseRateLimiter();
             app.UseAuthentication();
+            app.UseRateLimiter();
             app.UseAuthorization();
 
             app.MapControllers();

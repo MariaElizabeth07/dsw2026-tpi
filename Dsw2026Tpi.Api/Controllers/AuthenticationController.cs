@@ -26,7 +26,7 @@ public class AuthenticationController : AppController
     }
 
     [HttpPost("admin/login")]
-    [EnableRateLimiting(RateLimitingConfigurationExtensions.AuthLoginPolicy)]
+    [EnableRateLimiting(RateLimitingConfigurationExtensions.AdminAuthenticationPolicy)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
@@ -37,7 +37,7 @@ public class AuthenticationController : AppController
     }
 
     [HttpPost("patient/login")]
-    [EnableRateLimiting(RateLimitingConfigurationExtensions.AuthLoginPolicy)]
+    [EnableRateLimiting(RateLimitingConfigurationExtensions.PatientAuthenticationPolicy)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
