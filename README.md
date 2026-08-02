@@ -1,7 +1,7 @@
 # Trabajo Práctico Integrador
 ## Desarrollo de Software 2026
 
-Acceso al [documento](https://frtutneduar-my.sharepoint.com/:b:/g/personal/vicentechibilisco_doc_frt_utn_edu_ar/IQBqAO7n0tThToIjU5lyvr6VARcezhr8xXfX6eJQJDkzCHA?e=I8A0pa)
+Acceso al [documento](https://frtutneduar-my.sharepoint.com/:b:/g/personal/franciscovicente_doc_frt_utn_edu_ar/IQD-5kaAARqnT5eL7EnPMCPgAfmPoH09HkfmQQYH8pMgqdA?e=i6C3fT)
 
 Instrucciones:
 * Realizar una bifurcación por grupo
