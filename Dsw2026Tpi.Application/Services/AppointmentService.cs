@@ -190,4 +190,98 @@ public class AppointmentService : IAppointmentService
             throw exception;
         }
     }
+
+    public async Task<Pagination<AppointmentModel.AdminSummary>> GetByDate(DateOnly? date, int pageSize, int pageIndex)
+    {
+        PaginationValidator.Validate(pageSize, pageIndex);
+
+        if (date is null)
+        {
+            throw new ValidationException().WithDetail(nameof(date), "El parámetro date es obligatorio.");
+        }
+
+        var appointments = await _persistence.Paginate<Appointment, DateOnly>(
+            pageSize,
+            pageIndex,
+            appointment => appointment.AvailabilitySlot!.SlotDate == date,
+            appointment => appointment.AvailabilitySlot!.SlotDate,
+            "AvailabilitySlot.Doctor.Speciality", "Patient");
+
+        return appointments.Map(MapAdminSummary);
+    }
+
+    public async Task<Pagination<AppointmentModel.AdminSummary>> Search(
+        int pageSize,
+        int pageIndex,
+        Guid? specialtyId,
+        Guid? doctorId,
+        long? dni,
+        DateOnly? date)
+    {
+        PaginationValidator.Validate(pageSize, pageIndex);
+
+        var dniText = dni?.ToString();
+
+        var appointments = await _persistence.Paginate<Appointment, DateOnly>(
+            pageSize,
+            pageIndex,
+            appointment =>
+                (!specialtyId.HasValue || appointment.AvailabilitySlot!.Doctor!.SpecialityId == specialtyId) &&
+                (!doctorId.HasValue || appointment.AvailabilitySlot!.DoctorId == doctorId) &&
+                (dniText == null || appointment.Patient!.Dni == dniText) &&
+                (!date.HasValue || appointment.AvailabilitySlot!.SlotDate == date),
+            appointment => appointment.AvailabilitySlot!.SlotDate,
+            "AvailabilitySlot.Doctor.Speciality", "Patient");
+
+        return appointments.Map(MapAdminSummary);
+    }
+
+    public async Task Attend(Guid id)
+    {
+        var appointment = await _persistence.GetById<Appointment>(id)
+            ?? throw new EntityNotFoundException(nameof(Appointment));
+
+        if (appointment.Status != AppointmentStatus.Booked)
+        {
+            throw new ConflictException(
+                nameof(ErrorCodes.APPOINTMENT_INVALID_STATUS_TRANSITION),
+                ErrorCodes.APPOINTMENT_INVALID_STATUS_TRANSITION);
+        }
+
+        appointment.Attend();
+        await _persistence.Update(appointment);
+    }
+
+    public async Task MarkNoShow(Guid id)
+    {
+        var appointment = await _persistence.GetById<Appointment>(id)
+            ?? throw new EntityNotFoundException(nameof(Appointment));
+
+        if (appointment.Status != AppointmentStatus.Booked)
+        {
+            throw new ConflictException(
+                nameof(ErrorCodes.APPOINTMENT_INVALID_STATUS_TRANSITION),
+                ErrorCodes.APPOINTMENT_INVALID_STATUS_TRANSITION);
+        }
+
+        appointment.MarkNoShow();
+        await _persistence.Update(appointment);
+    }
+
+    private static AppointmentModel.AdminSummary MapAdminSummary(Appointment appointment)
+    {
+        var slot = appointment.AvailabilitySlot!;
+        var doctor = slot.Doctor;
+        var patient = appointment.Patient!;
+
+        return new AppointmentModel.AdminSummary(
+            appointment.Id,
+            new AppointmentModel.DoctorSummary(doctor?.Id ?? slot.DoctorId, doctor?.Name ?? string.Empty),
+            new AppointmentModel.SpecialtySummary(doctor?.Speciality?.Id ?? Guid.Empty, doctor?.Speciality?.Name ?? string.Empty),
+            new AppointmentModel.SlotSummary(slot.Id, slot.SlotDate, slot.StartTime.ToString("HH:mm"), slot.EndTime.ToString("HH:mm")),
+            new AppointmentModel.PatientSummary(patient.Id, patient.Dni, patient.FullName),
+            appointment.Reason,
+            appointment.Status.ToString().ToUpperInvariant());
+    }
+
 }

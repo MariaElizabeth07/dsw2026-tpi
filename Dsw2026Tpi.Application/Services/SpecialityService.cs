@@ -1,6 +1,7 @@
 using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.CrossCutting.Exceptions;
+using Dsw2026Tpi.CrossCutting.Helpers;
 using Dsw2026Tpi.CrossCutting.Resources;
 using Dsw2026Tpi.Domain.Entities;
 using Dsw2026Tpi.Domain.Interfaces;
@@ -18,7 +19,7 @@ public class SpecialityService : ISpecialityService
 
     public async Task<Pagination<SpecialityModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null)
     {
-        ValidatePagination(pageSize, pageIndex);
+        PaginationValidator.Validate(pageSize, pageIndex);
         ValidateNameFilter(name);
 
         var specialities = await _persistence.Paginate<Speciality, string>(
@@ -83,26 +84,6 @@ public class SpecialityService : ISpecialityService
     private static SpecialityModel.Response MapResponse(Speciality speciality)
     {
         return new SpecialityModel.Response(speciality.Id, speciality.Name, speciality.Description);
-    }
-
-    private static void ValidatePagination(int pageSize, int pageIndex)
-    {
-        var exception = new ValidationException();
-
-        if (pageSize <= 0)
-        {
-            exception.WithDetail(nameof(pageSize), "El pageSize debe ser mayor a 0.");
-        }
-
-        if (pageIndex < 0)
-        {
-            exception.WithDetail(nameof(pageIndex), "El pageIndex debe ser mayor o igual a 0.");
-        }
-
-        if (exception.Error.Details.Count != 0)
-        {
-            throw exception;
-        }
     }
 
     private static void ValidateNameFilter(string? name)

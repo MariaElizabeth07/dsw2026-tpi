@@ -70,6 +70,15 @@ namespace Dsw2026Tpi.CrossCutting.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Solo se pueden marcar como atendidas o ausentes las citas en estado reservado.
+        /// </summary>
+        public static string APPOINTMENT_INVALID_STATUS_TRANSITION {
+            get {
+                return ResourceManager.GetString("APPOINTMENT_INVALID_STATUS_TRANSITION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Solo se pueden cancelar turnos en estado reservado.
         /// </summary>
         public static string APPOINTMENT_NOT_CANCELABLE {
