@@ -37,7 +37,7 @@ public class DoctorService : IDoctorService
     {
         ValidateRequest(request);
 
-        var speciality = await _persistence.GetById<Speciality>(request.SpecialityId)
+        var speciality = await _persistence.GetById<Speciality>(request.SpecialtyId)
             ?? throw new EntityNotFoundException(nameof(Speciality));
 
         await EnsureLicenseNumberIsUnique(request.LicenseNumber);
@@ -55,7 +55,7 @@ public class DoctorService : IDoctorService
         var doctor = await _persistence.GetById<Doctor>(id, nameof(Doctor.Speciality))
             ?? throw new EntityNotFoundException(nameof(Doctor));
 
-        var speciality = await _persistence.GetById<Speciality>(request.SpecialityId)
+        var speciality = await _persistence.GetById<Speciality>(request.SpecialtyId)
             ?? throw new EntityNotFoundException(nameof(Speciality));
 
         await EnsureLicenseNumberIsUnique(request.LicenseNumber, id);
@@ -101,7 +101,7 @@ public class DoctorService : IDoctorService
             doctor.Id,
             doctor.Name,
             doctor.LicenseNumber,
-            new DoctorModel.SpecialityDto(doctor.Speciality?.Id, doctor.Speciality?.Name));
+            new DoctorModel.SpecialtyDto(doctor.Speciality?.Id, doctor.Speciality?.Name));
     }
     
     private static void ValidateNameFilter(string? name)
@@ -140,9 +140,9 @@ public class DoctorService : IDoctorService
             exception.WithDetail(nameof(request.LicenseNumber), "El número de matrícula debe tener entre 4 y 20 caracteres.");
         }
 
-        if (request.SpecialityId == Guid.Empty)
+        if (request.SpecialtyId == Guid.Empty)
         {
-            exception.WithDetail(nameof(request.SpecialityId), "La especialidad es obligatoria.");
+            exception.WithDetail(nameof(request.SpecialtyId), "La especialidad es obligatoria.");
         }
 
         if (exception.Error.Details.Count != 0)
