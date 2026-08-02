@@ -189,6 +189,7 @@ public class AvailabilityService : IAvailabilityService
             .OrderBy(rule => ToSortOrder(rule.DayOfWeek))
             .ThenBy(rule => rule.StartTime)
             .Select(rule => new AvailabilityModel.Response(
+                rule.Id,
                 ToSpanishDay(rule.DayOfWeek),
                 rule.StartTime.ToString("HH:mm", CultureInfo.InvariantCulture),
                 rule.EndTime.ToString("HH:mm", CultureInfo.InvariantCulture)))
