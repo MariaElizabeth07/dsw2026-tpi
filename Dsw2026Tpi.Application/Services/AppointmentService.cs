@@ -274,14 +274,24 @@ public class AppointmentService : IAppointmentService
         var doctor = slot.Doctor;
         var patient = appointment.Patient!;
 
+        var specialty = new AppointmentModel.AdminSpecialtySummary(
+            doctor?.Speciality?.Id ?? Guid.Empty,
+            doctor?.Speciality?.Name ?? string.Empty);
+
+        var doctorSummary = new AppointmentModel.AdminDoctorSummary(
+            doctor?.Id ?? slot.DoctorId,
+            doctor?.Name ?? string.Empty,
+            specialty);
+
+        var patientSummary = new AppointmentModel.AdminPatientSummary(
+            long.TryParse(patient.Dni, out var dni) ? dni : 0,
+            patient.FullName);
+
         return new AppointmentModel.AdminSummary(
             appointment.Id,
-            new AppointmentModel.DoctorSummary(doctor?.Id ?? slot.DoctorId, doctor?.Name ?? string.Empty),
-            new AppointmentModel.SpecialtySummary(doctor?.Speciality?.Id ?? Guid.Empty, doctor?.Speciality?.Name ?? string.Empty),
-            new AppointmentModel.SlotSummary(slot.Id, slot.SlotDate, slot.StartTime.ToString("HH:mm"), slot.EndTime.ToString("HH:mm")),
-            new AppointmentModel.PatientSummary(patient.Id, patient.Dni, patient.FullName),
-            appointment.Reason,
-            appointment.Status.ToString().ToUpperInvariant());
+            appointment.Status.ToString().ToUpperInvariant(),
+            patientSummary,
+            doctorSummary);
     }
 
 }

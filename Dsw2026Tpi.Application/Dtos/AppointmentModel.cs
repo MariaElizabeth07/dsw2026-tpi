@@ -11,14 +11,8 @@ public record AppointmentModel
     public record DoctorSummary(Guid Id, string Name);
     public record SlotSummary(Guid Id, DateOnly Date, string StartTime, string EndTime);
     public record Response(Guid Id, DoctorSummary Doctor, SlotSummary Slot, string Reason, string Status, DateTime? CancelledAt);
-    public record SpecialtySummary(Guid Id, string Name);
-    public record PatientSummary(Guid Id, string Dni, string FullName);
-    public record AdminSummary(
-        Guid Id,
-        DoctorSummary Doctor,
-        SpecialtySummary Specialty,
-        SlotSummary Slot,
-        PatientSummary Patient,
-        string Reason,
-        string Status);
+    public record AdminSpecialtySummary(Guid SpecialtyId, string Name);
+    public record AdminDoctorSummary(Guid DoctorId, string Name, AdminSpecialtySummary Specialty);
+    public record AdminPatientSummary(long Dni, string FullName);
+    public record AdminSummary(Guid AppointmentsId, string AppointmentsStatus, AdminPatientSummary Patient, AdminDoctorSummary Doctor);
 }
