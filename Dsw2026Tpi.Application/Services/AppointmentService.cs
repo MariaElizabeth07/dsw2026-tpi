@@ -33,13 +33,13 @@ public class AppointmentService : IAppointmentService
         var doctor = await _persistence.GetById<Doctor>(request.DoctorId)
             ?? throw new EntityNotFoundException(nameof(Doctor));
 
-        var slot = await _persistence.GetById<AvailabilitySlot>(request.AvailabilityId)
+        var slot = await _persistence.GetById<AvailabilitySlot>(request.AvailabilitySlotId)
             ?? throw new EntityNotFoundException(nameof(AvailabilitySlot));
 
         if (slot.DoctorId != doctor.Id)
         {
             throw new ValidationException()
-                .WithDetail(nameof(request.AvailabilityId), "El turno no pertenece al médico indicado.");
+                .WithDetail(nameof(request.AvailabilitySlotId), "El turno no pertenece al médico indicado.");
         }
 
         var now = DateTime.Now;
@@ -166,9 +166,9 @@ public class AppointmentService : IAppointmentService
             exception.WithDetail(nameof(request.DoctorId), "El doctorId es obligatorio.");
         }
 
-        if (request.AvailabilityId == Guid.Empty)
+        if (request.AvailabilitySlotId == Guid.Empty)
         {
-            exception.WithDetail(nameof(request.AvailabilityId), "El availabilityId es obligatorio.");
+            exception.WithDetail(nameof(request.AvailabilitySlotId), "El availabilityId es obligatorio.");
         }
 
         if (request.Patient is null)
@@ -274,14 +274,24 @@ public class AppointmentService : IAppointmentService
         var doctor = slot.Doctor;
         var patient = appointment.Patient!;
 
+        var specialty = new AppointmentModel.AdminSpecialtySummary(
+            doctor?.Speciality?.Id ?? Guid.Empty,
+            doctor?.Speciality?.Name ?? string.Empty);
+
+        var doctorSummary = new AppointmentModel.AdminDoctorSummary(
+            doctor?.Id ?? slot.DoctorId,
+            doctor?.Name ?? string.Empty,
+            specialty);
+
+        var patientSummary = new AppointmentModel.AdminPatientSummary(
+            long.TryParse(patient.Dni, out var dni) ? dni : 0,
+            patient.FullName);
+
         return new AppointmentModel.AdminSummary(
             appointment.Id,
-            new AppointmentModel.DoctorSummary(doctor?.Id ?? slot.DoctorId, doctor?.Name ?? string.Empty),
-            new AppointmentModel.SpecialtySummary(doctor?.Speciality?.Id ?? Guid.Empty, doctor?.Speciality?.Name ?? string.Empty),
-            new AppointmentModel.SlotSummary(slot.Id, slot.SlotDate, slot.StartTime.ToString("HH:mm"), slot.EndTime.ToString("HH:mm")),
-            new AppointmentModel.PatientSummary(patient.Id, patient.Dni, patient.FullName),
-            appointment.Reason,
-            appointment.Status.ToString().ToUpperInvariant());
+            appointment.Status.ToString().ToUpperInvariant(),
+            patientSummary,
+            doctorSummary);
     }
 
 }
