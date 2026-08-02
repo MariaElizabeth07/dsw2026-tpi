@@ -19,6 +19,7 @@ public static class DependencyInjectionConfigurationExtensions
         services.AddScoped<IAuthenticatedUserValidationService, AuthenticatedUserValidationService>();
         services.AddScoped<IAppointmentService, AppointmentService>();
         services.AddSingleton<IJwtService, JwtService>();
+        services.AddSingleton<IHolidayProvider, HolidayProvider>();
         return services;
     }
 }
