@@ -33,13 +33,13 @@ public class AppointmentService : IAppointmentService
         var doctor = await _persistence.GetById<Doctor>(request.DoctorId)
             ?? throw new EntityNotFoundException(nameof(Doctor));
 
-        var slot = await _persistence.GetById<AvailabilitySlot>(request.AvailabilityId)
+        var slot = await _persistence.GetById<AvailabilitySlot>(request.AvailabilitySlotId)
             ?? throw new EntityNotFoundException(nameof(AvailabilitySlot));
 
         if (slot.DoctorId != doctor.Id)
         {
             throw new ValidationException()
-                .WithDetail(nameof(request.AvailabilityId), "El turno no pertenece al médico indicado.");
+                .WithDetail(nameof(request.AvailabilitySlotId), "El turno no pertenece al médico indicado.");
         }
 
         var now = DateTime.Now;
@@ -166,9 +166,9 @@ public class AppointmentService : IAppointmentService
             exception.WithDetail(nameof(request.DoctorId), "El doctorId es obligatorio.");
         }
 
-        if (request.AvailabilityId == Guid.Empty)
+        if (request.AvailabilitySlotId == Guid.Empty)
         {
-            exception.WithDetail(nameof(request.AvailabilityId), "El availabilityId es obligatorio.");
+            exception.WithDetail(nameof(request.AvailabilitySlotId), "El availabilityId es obligatorio.");
         }
 
         if (request.Patient is null)
