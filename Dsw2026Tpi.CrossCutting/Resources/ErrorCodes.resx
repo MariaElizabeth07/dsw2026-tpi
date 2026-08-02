@@ -168,4 +168,7 @@
   <data name="AUTHENTICATION_MISSING_TOKEN" xml:space="preserve">
     <value>Se necesita un token valido para acceder al recurso</value>
   </data>
+  <data name="APPOINTMENT_INVALID_STATUS_TRANSITION" xml:space="preserve">
+    <value>Solo se pueden marcar como atendidas o ausentes las citas en estado reservado</value>
+  </data>
 </root>
