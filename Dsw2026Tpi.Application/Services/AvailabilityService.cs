@@ -13,10 +13,12 @@ namespace Dsw2026Tpi.Application.Services;
 public class AvailabilityService : IAvailabilityService
 {
     private readonly IPersistence _persistence;
+    private readonly IHolidayProvider _holidayProvider;
 
-    public AvailabilityService(IPersistence persistence)
+    public AvailabilityService(IPersistence persistence, IHolidayProvider holidayProvider)
     {
         _persistence = persistence;
+        _holidayProvider = holidayProvider;
     }
 
     public async Task<IReadOnlyCollection<AvailabilityModel.Response>> Create(AvailabilityModel.Request request)
@@ -150,7 +152,9 @@ public class AvailabilityService : IAvailabilityService
             ?.ToList() ?? [];
         var newSlots = new List<AvailabilitySlot>();
 
-        var dates = DateTimeHelper.GetDatesForDay(day.DayOfWeek, context.StartDate, context.EndDate);
+        var dates = DateTimeHelper.GetDatesForDay(day.DayOfWeek, context.StartDate, context.EndDate)
+            .Where(date => !_holidayProvider.IsHoliday(date))
+            .ToList();
         var intervals = DateTimeHelper.BuildThirtyMinuteIntervals(day.StartTime, day.EndTime);
 
         foreach (var date in dates)
