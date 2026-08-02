@@ -41,14 +41,14 @@ public class AppointmentsController : AppController
     }
 
     [HttpDelete("{id:guid}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Cancel([FromRoute] Guid id)
     {
         await _service.Cancel(id, GetAuthenticatedEmail());
-        return NoContent();
+        return Ok("ok");
     }
 
     private string GetAuthenticatedEmail()
