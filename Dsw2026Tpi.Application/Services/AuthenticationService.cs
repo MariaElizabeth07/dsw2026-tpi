@@ -42,7 +42,7 @@ public class AuthenticationService : IAuthenticationService
                 .WithDetail(nameof(request.Email), "El email no tiene un formato válido.");
         }
 
-        if (!request.Dni.IsDNIValid())
+        if (!request.Dni.IsPatientLoginDNIValid())
         {
             throw new ValidationException()
                 .WithDetail(nameof(request.Dni), "El DNI no tiene un formato válido.");
@@ -86,7 +86,7 @@ public class AuthenticationService : IAuthenticationService
 
         if (patientEntity is null)
         {
-            patientEntity = new Patient(user.Id, dni, request.Email);
+            patientEntity = new Patient(user.Id, dni, string.Empty);
             await _persistence.Add<Patient>(patientEntity);
         }
 

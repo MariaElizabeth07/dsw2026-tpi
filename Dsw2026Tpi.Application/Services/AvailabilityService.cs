@@ -66,24 +66,21 @@ public class AvailabilityService : IAvailabilityService
 
         var existingSlots = (await _persistence.GetFiltered<AvailabilitySlot>(
             slot => slot.DoctorId == doctor.Id &&
-                slot.SlotDate >= context.MonthStartDate &&
+                slot.SlotDate >= context.StartDate &&
                 slot.SlotDate <= context.EndDate))
             ?.ToList() ?? [];
 
-        if (existingSlots.Any(slot => slot.Status == SlotStatus.Booked))
-        {
-            throw new ConflictException(
-                nameof(ErrorCodes.AVAILABILITY_HAS_BOOKED_SLOTS),
-                ErrorCodes.AVAILABILITY_HAS_BOOKED_SLOTS);
-        }
+        var slotsToDelete = existingSlots
+            .Where(slot => slot.Status != SlotStatus.Booked)
+            .ToList();
 
-        foreach (var slot in existingSlots)
+        foreach (var slot in slotsToDelete)
         {
             slot.Delete();
         }
-        if (existingSlots.Count != 0)
+        if (slotsToDelete.Count != 0)
         {
-            await _persistence.UpdateRange(existingSlots);
+            await _persistence.UpdateRange(slotsToDelete);
         }
 
         foreach (var rule in existingRules)
@@ -203,6 +200,12 @@ public class AvailabilityService : IAvailabilityService
         if (request.Days is null)
         {
             exception.WithDetail(nameof(request.Days), "days debe ser un arreglo.");
+            throw exception;
+        }
+
+        if (request.Days.Count == 0)
+        {
+            exception.WithDetail(nameof(request.Days), "days debe contener al menos un día.");
             throw exception;
         }
 
