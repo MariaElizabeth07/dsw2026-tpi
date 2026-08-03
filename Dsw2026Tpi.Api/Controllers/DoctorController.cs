@@ -27,14 +27,14 @@ public class DoctorController : AppController
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Create([FromBody] DoctorModel.Request request)
     {
         var doctor = await _service.Create(request);
-        return Ok(doctor);
+        return StatusCode(StatusCodes.Status201Created, doctor);
     }
 
     [HttpPut("{id:guid}")]

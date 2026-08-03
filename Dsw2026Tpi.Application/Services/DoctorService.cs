@@ -101,7 +101,9 @@ public class DoctorService : IDoctorService
             doctor.Id,
             doctor.Name,
             doctor.LicenseNumber,
-            new DoctorModel.SpecialtyDto(doctor.Speciality?.Id, doctor.Speciality?.Name));
+            new DoctorModel.SpecialtyDto(
+                doctor.Speciality?.Id ?? doctor.SpecialityId ?? Guid.Empty,
+                doctor.Speciality?.Name ?? string.Empty));
     }
     
     private static void ValidateNameFilter(string? name)

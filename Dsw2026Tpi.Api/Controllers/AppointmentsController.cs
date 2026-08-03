@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
+using Dsw2026Tpi.Api.Configurations;
 using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Application.Interfaces;
-using Dsw2026Tpi.Api.Configurations;
 using Dsw2026Tpi.CrossCutting.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +21,7 @@ public class AppointmentsController : AppController
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -31,7 +31,7 @@ public class AppointmentsController : AppController
     public async Task<IActionResult> Create([FromBody] AppointmentModel.Request request)
     {
         var response = await _service.Create(request, GetAuthenticatedEmail());
-        return Ok(response);
+        return StatusCode(StatusCodes.Status201Created, response);
     }
 
     [HttpGet("patient")]
