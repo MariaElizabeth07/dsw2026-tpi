@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.Json;
-using Dsw2026Tpi.Domain.Interfaces;
 using Dsw2026Tpi.Data.Options;
+using Dsw2026Tpi.Domain.Interfaces;
 
-namespace Dsw2026Tpi.Data;
+namespace Dsw2026Tpi.Data.Providers;
 
 public class HolidayProvider : IHolidayProvider
 {
