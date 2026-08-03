@@ -20,13 +20,13 @@ public class DoctorConfiguration : IEntityTypeConfiguration<Doctor>
 
         builder.HasIndex(d => d.LicenseNumber)
             .IsUnique()
-            .HasFilter("[IsActive] = 1");
+            .HasFilter("[IsActive] = 1 AND [Deleted] = 0");
 
         builder.HasOne(d => d.Speciality)
             .WithMany()
             .HasForeignKey(d => d.SpecialityId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasQueryFilter(d => d.IsActive);
+        builder.HasQueryFilter(d => !d.Deleted);
     }
 }

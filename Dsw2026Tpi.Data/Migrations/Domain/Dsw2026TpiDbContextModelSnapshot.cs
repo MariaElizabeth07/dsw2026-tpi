@@ -176,6 +176,9 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -199,7 +202,7 @@ namespace Dsw2026Tpi.Data.Migrations.Domain
 
                     b.HasIndex("LicenseNumber")
                         .IsUnique()
-                        .HasFilter("[IsActive] = 1");
+                        .HasFilter("[IsActive] = 1 AND [Deleted] = 0");
 
                     b.HasIndex("SpecialityId");
 
