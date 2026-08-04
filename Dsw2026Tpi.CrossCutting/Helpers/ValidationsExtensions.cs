@@ -11,8 +11,13 @@ public static class ValidationsExtensions
             Regex.IsMatch(email, EmailPattern);
     }
 
-    public static bool IsDNIValid(this long dni)
+    public static bool IsPatientLoginDNIValid(this long dni)
     {
         return dni is >= 1_000_000 and <= 99_999_999;
+    }
+
+    public static bool IsAppointmentDNIValid(this long dni)
+    {
+        return dni is >= 1_000_000 and <= 9_999_999_999;
     }
 }

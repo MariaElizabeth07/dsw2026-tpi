@@ -100,7 +100,7 @@ public class AuthenticationServiceTests
         await _userManager.Received(1).CreateAsync(Arg.Is<ApplicationUser>(user =>
             user != null && user.Email == request.Email && user.Dni == request.Dni.ToString()));
         await _persistence.Received(1).Add(Arg.Is<Patient>(patient =>
-            patient != null && patient.Dni == request.Dni.ToString() && patient.FullName == request.Email));
+            patient != null && patient.Dni == request.Dni.ToString() && patient.FullName == string.Empty));
         await _userManager.Received(1).AddToRoleAsync(Arg.Any<ApplicationUser>(), Roles.Patient);
     }
 

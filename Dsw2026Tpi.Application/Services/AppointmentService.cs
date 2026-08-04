@@ -79,7 +79,7 @@ public class AppointmentService : IAppointmentService
 
     public async Task<IReadOnlyCollection<AppointmentModel.Response>> GetByPatient(long dni, string authenticatedEmail)
     {
-        if (!dni.IsDNIValid())
+        if (!dni.IsAppointmentDNIValid())
         {
             throw new ValidationException().WithDetail(nameof(dni), "El DNI no tiene un formato válido.");
         }
@@ -153,7 +153,7 @@ public class AppointmentService : IAppointmentService
             new AppointmentModel.DoctorSummary(doctor?.Id ?? slot.DoctorId, doctor?.Name ?? string.Empty),
             new AppointmentModel.SlotSummary(slot.Id, slot.SlotDate, slot.StartTime.ToString("HH:mm"), slot.EndTime.ToString("HH:mm")),
             appointment.Reason,
-            appointment.Status.ToString().ToUpperInvariant(),
+            MapStatus(appointment.Status),
             appointment.CancelledAt);
     }
 
@@ -175,7 +175,7 @@ public class AppointmentService : IAppointmentService
         {
             exception.WithDetail(nameof(request.Patient), "El paciente es obligatorio.");
         }
-        else if (!request.Patient.Dni.IsDNIValid())
+        else if (!request.Patient.Dni.IsAppointmentDNIValid())
         {
             exception.WithDetail("patient.dni", "El DNI debe tener entre 7 y 10 dígitos.");
         }
@@ -285,13 +285,25 @@ public class AppointmentService : IAppointmentService
 
         var patientSummary = new AppointmentModel.AdminPatientSummary(
             long.TryParse(patient.Dni, out var dni) ? dni : 0,
-            patient.FullName);
+            string.Empty);
 
         return new AppointmentModel.AdminSummary(
             appointment.Id,
-            appointment.Status.ToString().ToUpperInvariant(),
+            MapStatus(appointment.Status),
             patientSummary,
             doctorSummary);
+    }
+
+    private static string MapStatus(AppointmentStatus status)
+    {
+        return status switch
+        {
+            AppointmentStatus.Booked => "BOOKED",
+            AppointmentStatus.Canceled => "CANCELLED",
+            AppointmentStatus.Attended => "ATTENDED",
+            AppointmentStatus.NoShow => "NO_SHOW",
+            _ => status.ToString().ToUpperInvariant(),
+        };
     }
 
 }

@@ -18,14 +18,14 @@ public class AvailabilitiesController : AppController
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Create([FromBody] AvailabilityModel.Request request)
     {
         var response = await _service.Create(request);
-        return Ok(response);
+        return StatusCode(StatusCodes.Status201Created, response);
     }
 
     [HttpPut]

@@ -22,8 +22,8 @@ public class AppointmentsAdminController : AppController
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetByDate(
         [FromQuery] DateOnly? date,
-        [FromQuery] int pageSize,
-        [FromQuery] int pageIndex)
+        [FromQuery] int pageSize = 10,
+        [FromQuery] int pageIndex = 0)
     {
         var response = await _service.GetByDate(date, pageSize, pageIndex);
         return Ok(response);

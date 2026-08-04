@@ -5,6 +5,7 @@ public class Doctor: EntityBase
     public string Name { get; private set; }
     public string LicenseNumber { get; private set; }
     public bool IsActive { get; private set; }
+    public bool Deleted { get; private set; }
     public Guid? SpecialityId { get; private set; }
     public Speciality? Speciality { get; private set; }
 
@@ -22,6 +23,7 @@ public class Doctor: EntityBase
         LicenseNumber = licenseNumber;
         Speciality = speciality;
         IsActive = true;
+        Deleted = false;
     }
 
     public void Update(string name, string licenseNumber, Speciality speciality)
@@ -34,6 +36,6 @@ public class Doctor: EntityBase
 
     public void Deactivate()
     {
-        IsActive = false;
+        Deleted = true;
     }
 }
