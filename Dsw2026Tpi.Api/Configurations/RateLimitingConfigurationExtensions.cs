@@ -15,7 +15,6 @@ public static class RateLimitingConfigurationExtensions
 
     public static IServiceCollection AddAppRateLimiting(this IServiceCollection services, IConfiguration configuration)
     {
-        // Se leen los límites desde appsettings para evitar valores fijos
         var settings = configuration.GetSection("RateLimiting").Get<RateLimitingSettings>() ?? new RateLimitingSettings();
 
         services.AddRateLimiter(options =>
@@ -42,14 +41,12 @@ public static class RateLimitingConfigurationExtensions
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
                 BuildLimiter(GetUserOrIpPartitionKey(httpContext), settings.General));
 
-            // Los logins se limitan por IP porque todavía no existe un usuario autenticado
             options.AddPolicy(AdminAuthenticationPolicy, httpContext =>
                 BuildLimiter(GetIpPartitionKey(httpContext), settings.AdminAuthentication));
 
             options.AddPolicy(PatientAuthenticationPolicy, httpContext =>
                 BuildLimiter(GetIpPartitionKey(httpContext), settings.PatientAuthentication));
 
-            // La reserva se limita por paciente autenticado y si no hay claim se toma la IP
             options.AddPolicy(AppointmentBookingPolicy, httpContext =>
                 BuildLimiter(GetUserOrIpPartitionKey(httpContext), settings.AppointmentBooking));
         });
