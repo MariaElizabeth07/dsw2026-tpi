@@ -80,6 +80,11 @@ public class DoctorService : IDoctorService
         return _availabilityService.GetByDoctor(id);
     }
 
+    public Task<IReadOnlyCollection<AvailabilityModel.SlotResponse>> GetAvailableSlots(Guid id)
+    {
+        return _availabilityService.GetAvailableSlots(id);
+    }
+
     private async Task EnsureLicenseNumberIsUnique(string licenseNumber, Guid? doctorId = null)
     {
         var trimmed = licenseNumber.Trim();
