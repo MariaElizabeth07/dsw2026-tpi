@@ -20,7 +20,7 @@ public class SpecialityService : ISpecialityService
     public async Task<Pagination<SpecialityModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null)
     {
         PaginationValidator.Validate(pageSize, pageIndex);
-        ValidateNameFilter(name);
+        NameFilterValidator.Validate(name);
 
         var specialities = await _persistence.Paginate<Speciality, string>(
             pageSize,
@@ -84,21 +84,6 @@ public class SpecialityService : ISpecialityService
     private static SpecialityModel.Response MapResponse(Speciality speciality)
     {
         return new SpecialityModel.Response(speciality.Id, speciality.Name, speciality.Description);
-    }
-
-    private static void ValidateNameFilter(string? name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            return;
-        }
-
-        var trimmedName = name.Trim();
-        if (trimmedName.Length is < 3 or > 100)
-        {
-            throw new ValidationException()
-                .WithDetail(nameof(name), "El filtro name debe tener entre 3 y 100 caracteres.");
-        }
     }
 
     private static void ValidateRequest(SpecialityModel.Request request)

@@ -285,7 +285,7 @@ public class AppointmentService : IAppointmentService
 
         var patientSummary = new AppointmentModel.AdminPatientSummary(
             long.TryParse(patient.Dni, out var dni) ? dni : 0,
-            string.Empty);
+            patient.FullName);
 
         return new AppointmentModel.AdminSummary(
             appointment.Id,

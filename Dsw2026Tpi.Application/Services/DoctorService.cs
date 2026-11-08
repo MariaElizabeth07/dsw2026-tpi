@@ -22,7 +22,7 @@ public class DoctorService : IDoctorService
     public async Task<Pagination<DoctorModel.Response>> GetAll(int pageSize, int pageIndex, string? name = null)
     {
         PaginationValidator.Validate(pageSize, pageIndex);
-        ValidateNameFilter(name);
+        NameFilterValidator.Validate(name);
 
         var doctors = await _persistence.Paginate<Doctor, string>(pageSize,
             pageIndex,
@@ -80,6 +80,11 @@ public class DoctorService : IDoctorService
         return _availabilityService.GetByDoctor(id);
     }
 
+    public Task<IReadOnlyCollection<AvailabilityModel.SlotResponse>> GetAvailableSlots(Guid id)
+    {
+        return _availabilityService.GetAvailableSlots(id);
+    }
+
     private async Task EnsureLicenseNumberIsUnique(string licenseNumber, Guid? doctorId = null)
     {
         var trimmed = licenseNumber.Trim();
@@ -106,20 +111,6 @@ public class DoctorService : IDoctorService
                 doctor.Speciality?.Name ?? string.Empty));
     }
     
-    private static void ValidateNameFilter(string? name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            return;
-        }
-
-        if (name.Trim().Length is < 3 or > 100)
-        {
-            throw new ValidationException()
-                .WithDetail(nameof(name), "El filtro name debe tener entre 3 y 100 caracteres.");
-        }
-    }
-
     private static void ValidateRequest(DoctorModel.Request request)
     {
         var exception = new ValidationException();

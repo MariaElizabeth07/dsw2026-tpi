@@ -7,4 +7,5 @@ public interface IAvailabilityService
     Task<IReadOnlyCollection<AvailabilityModel.Response>> Create(AvailabilityModel.Request request);
     Task<IReadOnlyCollection<AvailabilityModel.Response>> Update(AvailabilityModel.Request request);
     Task<IReadOnlyCollection<AvailabilityModel.Response>> GetByDoctor(Guid doctorId);
+    Task<IReadOnlyCollection<AvailabilityModel.SlotResponse>> GetAvailableSlots(Guid doctorId);
 }

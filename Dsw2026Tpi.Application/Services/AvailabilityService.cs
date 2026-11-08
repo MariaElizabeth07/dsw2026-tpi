@@ -128,6 +128,28 @@ public class AvailabilityService : IAvailabilityService
         return MapResponses(rules);
     }
 
+    public async Task<IReadOnlyCollection<AvailabilityModel.SlotResponse>> GetAvailableSlots(Guid doctorId)
+    {
+        _ = await GetDoctor(doctorId);
+        var today = DateOnly.FromDateTime(DateTime.Today);
+
+        var slots = (await _persistence.GetFiltered<AvailabilitySlot>(
+            slot => slot.DoctorId == doctorId &&
+                slot.SlotDate >= today &&
+                slot.Status == SlotStatus.Available &&
+                !slot.Deleted))
+            ?.OrderBy(slot => slot.SlotDate)
+            .ThenBy(slot => slot.StartTime)
+            .Select(slot => new AvailabilityModel.SlotResponse(
+                slot.Id,
+                slot.SlotDate,
+                slot.StartTime.ToString("HH:mm", CultureInfo.InvariantCulture),
+                slot.EndTime.ToString("HH:mm", CultureInfo.InvariantCulture)))
+            .ToArray() ?? [];
+
+        return slots;
+    }
+
     private async Task<Doctor> GetDoctor(Guid doctorId)
     {
         if (doctorId == Guid.Empty)
