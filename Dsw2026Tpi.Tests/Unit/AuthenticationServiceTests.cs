@@ -171,6 +171,57 @@ public class AuthenticationServiceTests
         await _userManager.Received(1).AddToRoleAsync(Arg.Any<ApplicationUser>(), Roles.Administrator);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task LoginPatient_CuandoElDniPerteneceAOtroUsuario_EntoncesRechazaSinCrearUsuarioNiEmitirToken(bool userExists)
+    {
+        var request = new LoginPatientModel.Request("paciente@test.com", 12345678);
+        var user = userExists
+            ? new ApplicationUser { Id = "different-user", Email = request.Email, Dni = request.Dni.ToString() }
+            : null;
+        var patient = new Patient("original-user", request.Dni.ToString(), string.Empty);
+
+        _userManager.FindByEmailAsync(request.Email).Returns(Task.FromResult<ApplicationUser?>(user));
+        _persistence.First(
+                Arg.Is<Expression<Func<Patient, bool>>>(predicate => predicate != null && predicate.Compile()(patient)),
+                Arg.Any<string[]>())
+            .Returns(Task.FromResult<Patient?>(patient));
+
+        var exception = await Assert.ThrowsAsync<AuthenticationException>(() => _service.LoginPatient(request));
+
+        Assert.NotEmpty(exception.Error.Details);
+        await _userManager.DidNotReceive().CreateAsync(Arg.Any<ApplicationUser>());
+        await _userManager.DidNotReceive().UpdateAsync(Arg.Any<ApplicationUser>());
+        await _userManager.DidNotReceive().AddToRoleAsync(Arg.Any<ApplicationUser>(), Arg.Any<string>());
+        await _persistence.DidNotReceive().Add(Arg.Any<Patient>());
+        _jwtService.DidNotReceive().GenerateToken(Arg.Any<ApplicationUser>(), Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task LoginPatient_CuandoElPacientePerteneceAlUsuario_EntoncesDevuelveTokenSinDuplicarPaciente()
+    {
+        var request = new LoginPatientModel.Request("paciente@test.com", 12345678);
+        var user = new ApplicationUser { Id = "original-user", Email = request.Email, Dni = request.Dni.ToString() };
+        var patient = new Patient(user.Id, user.Dni, string.Empty);
+
+        _userManager.FindByEmailAsync(request.Email).Returns(Task.FromResult<ApplicationUser?>(user));
+        _persistence.First(
+                Arg.Is<Expression<Func<Patient, bool>>>(predicate => predicate != null && predicate.Compile()(patient)),
+                Arg.Any<string[]>())
+            .Returns(Task.FromResult<Patient?>(patient));
+        _userManager.IsInRoleAsync(user, Roles.Patient).Returns(Task.FromResult(true));
+        _userManager.UpdateAsync(user).Returns(Task.FromResult(IdentityResult.Success));
+        _jwtService.GenerateToken(user, Roles.Patient).Returns("patient-token");
+
+        var response = await _service.LoginPatient(request);
+
+        Assert.Equal("patient-token", response.Token);
+        Assert.Equal(Roles.Patient.ToUpperInvariant(), response.Role);
+        await _userManager.DidNotReceive().CreateAsync(Arg.Any<ApplicationUser>());
+        await _persistence.DidNotReceive().Add(Arg.Any<Patient>());
+    }
+
     private static UserManager<ApplicationUser> CreateUserManager()
     {
         var options = Substitute.For<IOptions<IdentityOptions>>();
