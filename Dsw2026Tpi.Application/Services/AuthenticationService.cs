@@ -63,6 +63,15 @@ public class AuthenticationService : IAuthenticationService
             throw new AuthenticationException().WithDetail(nameof(request.Email), "El DNI o el email ingresados no coinciden.");
         }
 
+        var patientEntity = await _persistence.First<Patient>(patient => patient.Dni == dni);
+
+        if (patientEntity is not null && (user is null || patientEntity.UserId != user.Id))
+        {
+            _logger.LogInformation("Patient login failed due to DNI belonging to a different user for email {Email}.", request.Email);
+            throw new AuthenticationException()
+                .WithDetail(nameof(request.Dni), "El DNI o el email ingresados no coinciden.");
+        }
+
         if (user is null)
         {
             user = new ApplicationUser
@@ -81,8 +90,6 @@ public class AuthenticationService : IAuthenticationService
                     .WithDetail(createUserResult.Errors.Select(error => (error.Code, error.Description)));
             }
         }
-
-        var patientEntity = await _persistence.First<Patient>(patient => patient.Dni == user.Dni);
 
         if (patientEntity is null)
         {
