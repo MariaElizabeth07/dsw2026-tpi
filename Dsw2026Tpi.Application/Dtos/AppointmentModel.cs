@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -14,5 +14,5 @@ public record AppointmentModel
     public record AdminSpecialtySummary(Guid SpecialtyId, string Name);
     public record AdminDoctorSummary(Guid DoctorId, string Name, AdminSpecialtySummary Specialty);
     public record AdminPatientSummary(long Dni, string FullName);
-    public record AdminSummary(Guid AppointmentsId, string AppointmentsStatus, AdminPatientSummary Patient, AdminDoctorSummary Doctor);
+    public record AdminSummary(Guid AppointmentsId, string AppointmentsStatus, AdminPatientSummary Patient, AdminDoctorSummary Doctor, SlotSummary Slot);
 }

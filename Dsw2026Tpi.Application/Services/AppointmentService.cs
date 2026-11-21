@@ -1,4 +1,4 @@
-﻿using Dsw2026Tpi.Application.Dtos;
+using Dsw2026Tpi.Application.Dtos;
 using Dsw2026Tpi.Application.Interfaces;
 using Dsw2026Tpi.CrossCutting.Exceptions;
 using Dsw2026Tpi.CrossCutting.Helpers;
@@ -291,7 +291,9 @@ public class AppointmentService : IAppointmentService
             appointment.Id,
             MapStatus(appointment.Status),
             patientSummary,
-            doctorSummary);
+            doctorSummary,
+            new AppointmentModel.SlotSummary(
+                slot.Id, slot.SlotDate, slot.StartTime.ToString("HH:mm"), slot.EndTime.ToString("HH:mm")));
     }
 
     private static string MapStatus(AppointmentStatus status)
