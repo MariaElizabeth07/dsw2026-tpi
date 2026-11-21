@@ -207,7 +207,7 @@ public class AppointmentService : IAppointmentService
             appointment => appointment.AvailabilitySlot!.SlotDate,
             "AvailabilitySlot.Doctor.Speciality", "Patient");
 
-        return appointments.Map(MapAdminSummary);
+        return await MapAdminSummaries(appointments);
     }
 
     public async Task<Pagination<AppointmentModel.AdminSummary>> Search(
@@ -233,7 +233,7 @@ public class AppointmentService : IAppointmentService
             appointment => appointment.AvailabilitySlot!.SlotDate,
             "AvailabilitySlot.Doctor.Speciality", "Patient");
 
-        return appointments.Map(MapAdminSummary);
+        return await MapAdminSummaries(appointments);
     }
 
     public async Task Attend(Guid id)
@@ -268,7 +268,20 @@ public class AppointmentService : IAppointmentService
         await _persistence.Update(appointment);
     }
 
-    private static AppointmentModel.AdminSummary MapAdminSummary(Appointment appointment)
+    private async Task<Pagination<AppointmentModel.AdminSummary>> MapAdminSummaries(Pagination<Appointment> appointments)
+    {
+        var emailsByUserId = new Dictionary<string, string?>();
+        foreach (var userId in appointments.Data.Select(appointment => appointment.Patient!.UserId).Distinct())
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            emailsByUserId[userId] = user?.Email;
+        }
+
+        return appointments.Map(appointment =>
+            MapAdminSummary(appointment, emailsByUserId[appointment.Patient!.UserId]));
+    }
+
+    private static AppointmentModel.AdminSummary MapAdminSummary(Appointment appointment, string? patientEmail)
     {
         var slot = appointment.AvailabilitySlot!;
         var doctor = slot.Doctor;
@@ -285,7 +298,8 @@ public class AppointmentService : IAppointmentService
 
         var patientSummary = new AppointmentModel.AdminPatientSummary(
             long.TryParse(patient.Dni, out var dni) ? dni : 0,
-            patient.FullName);
+            patient.FullName,
+            patientEmail);
 
         return new AppointmentModel.AdminSummary(
             appointment.Id,

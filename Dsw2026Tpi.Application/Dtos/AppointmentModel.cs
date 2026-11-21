@@ -13,6 +13,6 @@ public record AppointmentModel
     public record Response(Guid Id, DoctorSummary Doctor, SlotSummary Slot, string Reason, string Status, DateTime? CancelledAt);
     public record AdminSpecialtySummary(Guid SpecialtyId, string Name);
     public record AdminDoctorSummary(Guid DoctorId, string Name, AdminSpecialtySummary Specialty);
-    public record AdminPatientSummary(long Dni, string FullName);
+    public record AdminPatientSummary(long Dni, string FullName, string? Email = null);
     public record AdminSummary(Guid AppointmentsId, string AppointmentsStatus, AdminPatientSummary Patient, AdminDoctorSummary Doctor, SlotSummary Slot);
 }
